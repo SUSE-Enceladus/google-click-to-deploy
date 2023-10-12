@@ -1,0 +1,11 @@
+# set up chart area.
+git clone --branch ${2} ${1}
+mkdir /tmp/chart/
+cp -a neuvector-helm-gks/charts/core/. /tmp/chart/.
+cp -a chart/${3}/. /tmp/chart
+
+
+
+
+
+

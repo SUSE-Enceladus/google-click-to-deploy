@@ -1,0 +1,6 @@
+---
+
+users:
+  - Fullname: admin
+    Password: $PASSWORD
+    Role: admin
