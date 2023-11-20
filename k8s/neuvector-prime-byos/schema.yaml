@@ -243,6 +243,17 @@ properties:
     default: neuvector
     x-google-marketplace:
       type: NAMESPACE
+  serviceAccount:
+    type: string
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        description: >
+          Manages cluster wide resources
+        roles:
+        - type:
+          rulesType: PREDEFINED
+          rulesFromRoleName: edit
 
 required:
 - name

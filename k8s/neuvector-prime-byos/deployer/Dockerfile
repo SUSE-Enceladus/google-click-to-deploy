@@ -6,6 +6,7 @@ ARG CHART_NAME
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+    ca-certificates \
     gettext \
     git
 
@@ -13,7 +14,7 @@ RUN apt-get update \
 COPY tools/set-up-chart .
 RUN mkdir chart
 COPY chart ./chart
-RUN bash ./set-up-chart https://github.com/SUSE-Enceladus/neuvector-helm-gks.git byos $CHART_NAME
+RUN bash -vx ./set-up-chart https://github.com/SUSE-Enceladus/neuvector-helm-gks byos $CHART_NAME
 
 RUN cd /tmp && tar -czvf /tmp/$CHART_NAME.tar.gz chart
 
