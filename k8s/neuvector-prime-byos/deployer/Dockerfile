@@ -14,7 +14,7 @@ RUN apt-get update \
 COPY tools/set-up-chart .
 RUN mkdir chart
 COPY chart ./chart
-RUN bash -vx ./set-up-chart https://github.com/SUSE-Enceladus/neuvector-helm-gks byos $CHART_NAME
+RUN bash -vx ./set-up-chart https://github.com/SUSE-Enceladus/neuvector-helm-gks 5.2.4-t5 $CHART_NAME
 
 RUN cd /tmp && tar -czvf /tmp/$CHART_NAME.tar.gz chart
 

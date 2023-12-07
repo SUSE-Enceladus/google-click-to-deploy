@@ -12,14 +12,14 @@ $(info ---- TRACK = $(TRACK))
 VERIFY_WAIT_TIMEOUT = 1800
 
 #SOURCE_REGISTRY ?= marketplace.gcr.io/google
-SOURCE_REGISTRY ?= gcr.io/suse-gce-test
-IMAGE_NEUVECTOR ?= $(SOURCE_REGISTRY)/neuvector-prime-byos/controller:$(TRACK)
+SOURCE_REGISTRY ?= gcr.io/mp-images-public
+IMAGE_NEUVECTOR ?= $(SOURCE_REGISTRY)/neuvector-prime-byos:$(TRACK)
 
 # Main image
 image-$(CHART_NAME) := $(call get_sha256,$(IMAGE_NEUVECTOR))
 
 #C2D_CONTAINER_RELEASE := $(call get_c2d_release,$(image-$(CHART_NAME)))
-C2D_CONTAINER_RELEASE := 5.2.2
+C2D_CONTAINER_RELEASE := 5.2.4
 
 $(info ---- C2D_CONTAINER_RELEASE = $(C2D_CONTAINER_RELEASE))
 

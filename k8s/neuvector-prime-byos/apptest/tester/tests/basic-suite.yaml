@@ -21,14 +21,14 @@ actions:
         contains: <title>NeuVector</title>
       exitCode:
         equals: 0
-
-- name: Sleep for 120s
-  # allow for poking around in testing container
-  # remove before production
-  bashTest:
-    script: |
-          sleep 120
-    expect:
-      exitCode:
-        equals: 0
+# Un comment following to debug
+#- name: Sleep for 120s
+#  # allow for poking around in testing container
+#  # remove before production
+#  bashTest:
+#    script: |
+#          sleep 120
+#    expect:
+#      exitCode:
+#        equals: 0
 
