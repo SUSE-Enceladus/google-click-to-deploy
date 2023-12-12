@@ -1,0 +1,89 @@
+# Default values for rancher-prime-byos.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  images:
+
+    rancher_prime_byos:
+      registry: gcr.io/suse-gce-test
+      image: rancher-prime-byos
+      tag: "2.7"
+
+    rancher:
+      registry: gcr.io/suse-gce-test
+      image: rancher-prime-byos/rancher
+      tag: v2.7.9
+
+    rancher_postdelete:
+      registry: gcr.io/suse-gce-test
+      image: rancher-prime-byos/shell
+      tag: v0.1.21
+
+    rancher_auditlog:
+      registry: gcr.io/suse-gce-test
+      image: rancher-prime-byos/mirrored-bci-micro
+      tag: 15.4.14.3
+
+    cert_manager:
+      registry: gcr.io/suse-gce-test
+      image: rancher-prime-byos/cert-manager-controller
+      tag: v1.12.3
+
+    cert_manager_webhook:
+      registry: gcr.io/suse-gce-test
+      image: rancher-prime-byos/cert-manager-webhook
+      tag: v1.12.3
+
+    cert_manager_cainjector:
+      registry: gcr.io/suse-gce-test
+      image: rancher-prime-byos/cert-manager-cainjector
+      tag: v1.12.3
+
+    cert_manager_acmesolver:
+      registry: gcr.io/suse-gce-test
+      image: rancher-prime-byos/cert-manager-acmesolver
+      tag: v1.12.3
+
+    cert_manager_startupapicheck:
+      registry: gcr.io/suse-gce-test
+      image: rancher-prime-byos/cert-manager-ctl
+      tag: v1.12.3
+
+
+# NOTE: can be overridden by a global.images.rancher_prime_byos section.
+image:
+  repository: gcr.io/suse-gce-test/rancher-prime-byos
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  # tag: "latest"
+  tag: "2.7"
+
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  # create: true
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+securityContext:
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  runAsUser: 0
+
+rancherHostname: rancher.my.org
+rancherServerURL: https://rancher.my.org
+rancherReplicas: 1
+rancherBootstrapPassword: RancherAdmin99
+rancherIngressClassName: none

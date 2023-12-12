@@ -1,0 +1,105 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "rancher-prime-byos.fullname" . }}
+  labels:
+    {{- include "rancher-prime-byos.labels" . | nindent 4 }}
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "rancher-prime-byos.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ template "rancher-prime-byos.fullname" . }}
+      restartPolicy: Never
+      containers:
+        - name: {{ template "rancher-prime-byos.name" . }}
+          image: {{ template "rancher-prime-byos.image" . }}
+          imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command:
+            - /bin/bash
+            - /installer/app/run
+          env:
+            - name: INSTALLER_ACTION
+              value: "install"
+
+            # rancher/rancher
+            - name: RANCHER_IMAGE
+              value: "{{ .Values.global.images.rancher.registry }}/{{ .Values.global.images.rancher.image }}"
+            - name: RANCHER_IMAGE_TAG
+              value: {{ .Values.global.images.rancher.tag | quote }}
+
+            # rancher/shell
+            - name: RANCHER_POSTDELETE_IMAGE
+              value: "{{ .Values.global.images.rancher_postdelete.registry }}/{{ .Values.global.images.rancher_postdelete.image }}"
+            - name: RANCHER_POSTDELETE_IMAGE_TAG
+              value: {{ .Values.global.images.rancher_postdelete.tag | quote }}
+
+            # rancher/mirrored-bci-micro
+            - name: RANCHER_AUDITLOG_IMAGE
+              value: "{{ .Values.global.images.rancher_auditlog.registry }}/{{ .Values.global.images.rancher_auditlog.image }}"
+            - name: RANCHER_AUDITLOG_IMAGE_TAG
+              value: {{ .Values.global.images.rancher_auditlog.tag | quote }}
+
+            # jetstack/cert-manager-controller
+            - name: CERT_MANAGER_IMAGE
+              value: "{{ .Values.global.images.cert_manager.registry }}/{{ .Values.global.images.cert_manager.image }}"
+            - name: CERT_MANAGER_IMAGE_TAG
+              value: {{ .Values.global.images.cert_manager.tag | quote }}
+
+            # jetstack/cert-manager-webhook
+            - name: CERT_MANAGER_WEBHOOK_IMAGE
+              value: "{{ .Values.global.images.cert_manager_webhook.registry }}/{{ .Values.global.images.cert_manager_webhook.image }}"
+            - name: CERT_MANAGER_WEBHOOK_TAG
+              value: {{ .Values.global.images.cert_manager_webhook.tag | quote }}
+
+            # jetstack/cert-manager-cainjector
+            - name: CERT_MANAGER_CAINJECTOR_IMAGE
+              value: "{{ .Values.global.images.cert_manager_cainjector.registry }}/{{ .Values.global.images.cert_manager_cainjector.image }}"
+            - name: CERT_MANAGER_CAINJECTOR_IMAGE_TAG
+              value: {{ .Values.global.images.cert_manager_cainjector.tag | quote }}
+
+            # jetstack/cert-manager-acmesolver
+            - name: CERT_MANAGER_ACMESOLVER_IMAGE
+              value: "{{ .Values.global.images.cert_manager_acmesolver.registry }}/{{ .Values.global.images.cert_manager_acmesolver.image }}"
+            - name: CERT_MANAGER_ACMESOLVER_IMAGE_TAG
+              value: {{ .Values.global.images.cert_manager_acmesolver.tag | quote }}
+
+            # jetstack/cert-manager-ctl
+            - name: CERT_MANAGER_STARTUPAPICHECK_IMAGE
+              value: "{{ .Values.global.images.cert_manager_startupapicheck.registry }}/{{ .Values.global.images.cert_manager_startupapicheck.image }}"
+            - name: CERT_MANAGER_STARTUPAPICHECK_IMAGE_TAG
+              value: {{ .Values.global.images.cert_manager_startupapicheck.tag | quote }}
+
+{{- if .Values.rancherHostname }}
+            - name: RANCHER_HOSTNAME
+              value: {{ .Values.rancherHostname | quote }}
+{{- end }}
+{{- if .Values.rancherServerURL }}
+            - name: RANCHER_SERVER_URL
+              value: {{ .Values.rancherServerURL | quote }}
+{{- end }}
+{{- if .Values.rancherReplicas }}
+            - name: RANCHER_REPLICAS
+              value: {{ .Values.rancherReplicas | quote }}
+{{- end }}
+{{- if .Values.rancherBootstrapPassword }}
+            - name: RANCHER_BOOTSTRAP_PASSWORD
+              value: {{ .Values.rancherBootstrapPassword | quote }}
+{{- end }}
+{{- if .Values.rancherIngressClassName }}
+            - name: RANCHER_INGRESS_CLASS_NAME
+              value: {{ .Values.rancherIngressClassName | quote }}
+{{- end }}

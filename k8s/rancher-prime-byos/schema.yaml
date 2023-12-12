@@ -1,0 +1,354 @@
+x-google-marketplace:
+  schemaVersion: v2
+
+  applicationApiVersion: v1beta1
+
+  publishedVersion: "$TAG"
+  publishedVersionMetadata:
+    releaseNote: >-
+      Initial marketplace release.
+    releaseTypes:
+      - Feature
+    recommended: false
+
+  images:
+    '':
+      properties:
+        global.images.rancher_prime_byos.image:
+          type: REPO_WITHOUT_REGISTRY
+          default: rancher-prime-byos
+        global.images.rancher_prime_byos.registry:
+          type: REGISTRY
+          default: $REGISTRY
+        global.images.rancher_prime_byos.tag:
+          type: TAG
+          default: $TAG
+
+    rancher:
+      properties:
+        global.images.rancher.image:
+          type: REPO_WITHOUT_REGISTRY
+          default: rancher-prime-byos/rancher
+        global.images.rancher.registry:
+          type: REGISTRY
+          default: $REGISTRY
+        global.images.rancher.tag:
+          type: TAG
+          default: $TAG
+
+    shell:
+      properties:
+        global.images.rancher_postdelete.image:
+          type: REPO_WITHOUT_REGISTRY
+          default: rancher-prime-byos/shell
+        global.images.rancher_postdelete.registry:
+          type: REGISTRY
+          default: $REGISTRY
+        global.images.rancher_postdelete.tag:
+          type: TAG
+          default: v0.1.21
+
+    mirrored-bci-micro:
+      properties:
+        global.images.rancher_auditlog.image:
+          type: REPO_WITHOUT_REGISTRY
+          default: rancher-prime-byos/mirrored-bci-micro
+        global.images.rancher_postdelete.registry:
+          type: REGISTRY
+          default: $REGISTRY
+        global.images.rancher_postdelete.tag:
+          type: TAG
+          default: "15.4.14.3"
+
+    cert-manager-controller:
+      properties:
+        global.images.cert_manager.image:
+          type: REPO_WITHOUT_REGISTRY
+          default: rancher-prime-byos/cert-manager-controller
+        global.images.cert_manager.registry:
+          type: REGISTRY
+          default: $REGISTRY
+        global.images.cert_manager.tag:
+          type: TAG
+          default: v1.12.3
+
+    cert-manager-webhook:
+      properties:
+        global.images.cert_manager_webhook.image:
+          type: REPO_WITHOUT_REGISTRY
+          default: rancher-prime-byos/cert-manager-webhook
+        global.images.cert_manager_webhook.registry:
+          type: REGISTRY
+          default: $REGISTRY
+        global.images.cert_manager_webhook.tag:
+          type: TAG
+          default: v1.12.3
+
+    cert-manager-cainjector:
+      properties:
+        global.images.cert_manager_cainjector.image:
+          type: REPO_WITHOUT_REGISTRY
+          default: rancher-prime-byos/cert-manager-cainjector
+        global.images.cert_manager_cainjector.registry:
+          type: REGISTRY
+          default: $REGISTRY
+        global.images.cert_manager_cainjector.tag:
+          type: TAG
+          default: v1.12.3
+
+    cert-manager-acmesolver:
+      properties:
+        global.images.cert_manager_acmesolver.image:
+          type: REPO_WITHOUT_REGISTRY
+          default: rancher-prime-byos/cert-manager-acmesolver
+        global.images.cert_manager_acmesolver.registry:
+          type: REGISTRY
+          default: $REGISTRY
+        global.images.cert_manager_acmesolver.tag:
+          type: TAG
+          default: v1.12.3
+
+    cert-manager-ctl:
+      properties:
+        global.images.cert_manager_startupapicheck.image:
+          type: REPO_WITHOUT_REGISTRY
+          default: rancher-prime-byos/cert-manager-ctl
+        global.images.cert_manager_startupapicheck.registry:
+          type: REGISTRY
+          default: $REGISTRY
+        global.images.cert_manager_startupapicheck.tag:
+          type: TAG
+          default: v1.12.3
+
+clusterConstraints:
+  k8sVersion: "<1.27"
+#   resources:
+#     - replicas: 3
+#       requests:
+#         cpu: 2000m
+#         memory: 8192Mi
+#   istio:
+#     type: OPTIONAL
+
+properties:
+  name:
+    type: string
+    default: rancher-prime-byos
+    x-google-marketplace:
+      type: NAME
+
+  namespace:
+    type: string
+    default: rancher-prime-byos-ns
+    x-google-marketplace:
+      type: NAMESPACE
+
+  rancherHostname:
+    type: string
+
+  rancherServerURL:
+    type: string
+
+  rancherReplicas:
+    type: int
+    default: 1
+
+  rancherBootstrapPassword:
+    type: string
+
+  rancherIngressClassName:
+    type: string
+    default: none
+
+  serviceAccount.name:
+    type: string
+    title: Rancher Service Account
+    default: rancher-prime-byos-sa
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        description: >
+          Manages cluster wide resources
+        roles:
+        - type: ClusterRole
+          rulesType: CUSTOM
+          rules:
+
+          - apiGroups: [""]
+            resources:
+            - "namespaces"
+            - "nodes"
+            - "pods"
+            - "services"
+
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+            - "update"
+
+          - apiGroups: [""]
+            resources:
+            - "bindings"
+            - "configmaps"
+            - "endpoints"
+            - "events"
+            - "limitranges"
+            - "namespaces/status"
+            - "persistentvolumeclaims"
+            - "persistentvolumeclaims/status"
+            - "pods/log"
+            - "pods/status"
+            - "replicationcontrollers"
+            - "replicationcontrollers/scale"
+            - "replicationcontrollers/status"
+            - "resourcequotas"
+            - "resourcequotas/status"
+            - "serviceaccounts"
+            - "services/status"
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+
+          - apiGroups: ["apiextensions.k8s.io"]
+            resources:
+            - "customresourcedefinitions"
+            verbs: ['*']
+
+          - apiGroups: ["admissionregistration.k8s.io"]
+            resources:
+            - "mutatingwebhookconfigurations"
+            - "validatingwebhookconfigurations"
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+            - "create"
+            - "update"
+            - "delete"
+            - "patch"
+
+          - apiGroups: ["discovery.k8s.io"]
+            resources:
+            - "endpointslices"
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+
+          - apiGroups: ["networking.k8s.io"]
+            resources:
+            - "ingresses"
+            - "ingresses/status"
+            - "networkpolicies"
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+
+          - apiGroups: ["rbac.authorization.k8s.io"]
+            resources:
+            - "clusterrolebindings"
+            - "clusterroles"
+            - "rolebindings"
+            - "roles"
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+            - "create"
+            - "patch"
+
+          - apiGroups: ["rancher.com"]
+            resources:
+            - "nvadmissioncontrolsecurityrules"
+            - "nvwafsecurityrules"
+            - "nvclustersecurityrules"
+            - "nvdlpsecurityrules"
+            - "nvsecurityrules"
+            verbs:
+            - "get"
+            - "list"
+            - "delete"
+
+          - apiGroups: ["susecloud.net"]
+            resources:
+            - "cspadapterusagerecords"
+            verbs:
+            - "get"
+            - "create"
+            - "update"
+            - "delete"
+            - "patch"
+
+          - apiGroups: ["apps"]
+            resources:
+            - "controllerrevisions"
+            - "daemonsets"
+            - "daemonsets/status"
+            - "deployments"
+            - "deployments/scale"
+            - "deployments/status"
+            - "replicasets"
+            - "replicasets/scale"
+            - "replicasets/status"
+            - "statefulsets"
+            - "statefulsets/scale"
+            - "statefulsets/status"
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+
+          - apiGroups: ["autoscaling"]
+            resources:
+            - "horizontalpodautoscalers"
+            - "horizontalpodautoscalers/status"
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+
+          - apiGroups: ["batch"]
+            resources:
+            - "cronjobs"
+            - "cronjobs/status"
+            - "jobs"
+            - "jobs/status"
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+
+          - apiGroups: ["extensions"]
+            resources:
+            - "daemonsets"
+            - "daemonsets/status"
+            - "deployments"
+            - "deployments/scale"
+            - "deployments/status"
+            - "ingresses"
+            - "ingresses/status"
+            - "networkpolicies"
+            - "replicasets"
+            - "replicasets/scale"
+            - "replicasets/status"
+            - "replicationcontrollers/scale"
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+
+          - apiGroups: ["policy"]
+            resources:
+            - "poddisruptionbudgets"
+            - "poddisruptionbudgets/status"
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+
+required:
+- name
+- namespace

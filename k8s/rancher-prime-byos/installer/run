@@ -1,0 +1,182 @@
+#!/bin/bash
+set -e
+set -vx
+
+app_dir=/installer/app
+charts_dir=${app_dir}/charts
+
+action="${INSTALLER_ACTION:-${1:-install}}"
+
+name=${INSTALLATION_NAME:-rancher-prime-byos}
+rancher_hostname=${RANCHER_HOSTNAME:-rancher.my.org}
+rancher_server_url=${RANCHER_SERVER_URL:-https://${rancher_hostname}}
+rancher_replicas=${RANCHER_REPLICAS:-1}
+rancher_bootstrap_password=${RANCHER_BOOTSTRAP_PASSWORD:-RancherAdmin99}
+
+helm_timeout=20m
+
+rancher_image_args=
+if [[ -n "${RANCHER_IMAGE}" ]]
+then
+	rancher_image_args="--set rancherImage=${RANCHER_IMAGE}"
+fi
+if [[ -n "${RANCHER_IMAGE_TAG}" ]]
+then
+	rancher_image_args="${rancher_image_args} --set rancherImageTag=${RANCHER_IMAGE_TAG}"
+fi
+if [[ -n "${RANCHER_POSTDELETE_IMAGE}" ]]
+then
+        rancher_image_args="${rancher_image_args} --set postDelete.image.repository=${RANCHER_POSTDELETE_IMAGE}"
+fi
+if [[ -n "${RANCHER_POSTDELETE_IMAGE_TAG}" ]]
+then
+        rancher_image_args="${rancher_image_args} --set postDelete.image.tag=${RANCHER_POSTDELETE_IMAGE_TAG}"
+fi
+if [[ -n "${RANCHER_AUDITLOG_IMAGE}" ]]
+then
+        rancher_image_args="${rancher_image_args} --set auditLog.image.repository=${RANCHER_AUDITLOG_IMAGE}"
+fi
+if [[ -n "${RANCHER_AUDITLOG_IMAGE_TAG}" ]]
+then
+        rancher_image_args="${rancher_image_args} --set auditLog.image.tag=${RANCHER_AUDITLOG_IMAGE_TAG}"
+fi
+
+rancher_ingress_class_name_arguments=
+if [[ -n "${RANCHER_INGRESS_CLASS_NAME}" && "${RANCHER_INGRESS_CLASS_NAME}" != "none" ]]
+then
+	rancher_ingress_class_name_arguments="--set ingress.ingressClassName=${RANCHER_INGRESS_CLASS_NAME}"
+fi
+
+cert_manager_image_args=
+if [[ -n "${CERT_MANAGER_IMAGE}" ]]
+then
+        cert_manager_image_args="--set image.repository=${CERT_MANAGER_IMAGE}" 
+fi
+if [[ -n "${CERT_MANAGER_IMAGE_TAG}" ]]
+then
+	cert_manager_image_args="${cert_manager_image_args} --set image.tag=${CERT_MANAGER_IMAGE_TAG}"
+fi
+if [[ -n "${CERT_MANAGER_WEBHOOK_IMAGE}" ]]
+then
+        cert_manager_image_args="${cert_manager_image_args} --set webhook.image.repository=${CERT_MANAGER_WEBHOOK_IMAGE}"
+fi
+if [[ -n "${CERT_MANAGER_WEBHOOK_IMAGE_TAG}" ]]
+then
+        cert_manager_image_args="${cert_manager_image_args} --set webhook.image.tag=${CERT_MANAGER_WEBHOOK_IMAGE_TAG}"
+fi
+if [[ -n "${CERT_MANAGER_CAINJECTOR_IMAGE}" ]]
+then
+        cert_manager_image_args="${cert_manager_image_args} --set cainjector.image.repository=${CERT_MANAGER_CAINJECTOR_IMAGE}"
+fi
+if [[ -n "${CERT_MANAGER_CAINJECTOR_IMAGE_TAG}" ]]
+then
+        cert_manager_image_args="${cert_manager_image_args} --set cainjector.image.tag=${CERT_MANAGER_CAINJECTOR_IMAGE_TAG}"
+fi
+if [[ -n "${CERT_MANAGER_ACMESOLVER_IMAGE}" ]]
+then
+        cert_manager_image_args="${cert_manager_image_args} --set acmesolver.image.repository=${CERT_MANAGER_ACMESOLVER_IMAGE}"
+fi
+if [[ -n "${CERT_MANAGER_ACMESOLVER_IMAGE_TAG}" ]]
+then
+        cert_manager_image_args="${cert_manager_image_args} --set acmesolver.image.tag=${CERT_MANAGER_ACMESOLVER_IMAGE_TAG}"
+fi
+if [[ -n "${CERT_MANAGER_STARTUPAPICHECK_IMAGE}" ]]
+then
+        cert_manager_image_args="${cert_manager_image_args} --set startupapicheck.image.repository=${CERT_MANAGER_STARTUPAPICHECK_IMAGE}"
+fi
+if [[ -n "${CERT_MANAGER_STARTUPAPICHECK_IMAGE_TAG}" ]]
+then
+        cert_manager_image_args="${cert_manager_image_args} --set startupapicheck.image.tag=${CERT_MANAGER_STARTUPAPICHECK_IMAGE_TAG}"
+fi
+
+HasKubernetesNamespace()
+{       
+    kubectl get namespace "${1}" 1>/dev/null 2>/dev/null
+}
+
+CreateKubernetesNamespace()
+{
+    kubectl create namespace "${1}"
+}
+
+EnsureKubernetesNamespaceExists()
+{
+    HasKubernetesNamespace "${1}" \
+        || CreateKubernetesNamespace "${1}"
+}
+
+CleanupRancherCACertificateSecrets()
+{
+	kubectl delete secret tls-ca-additional -n cattle-csp-billing-adapter-system | true
+}
+
+CreateRancherCACertificateSecrets()
+{
+	# cleanup the previously created secret so we create a fresh one every
+	# time, even though they may be the same.
+	CleanupRancherCACertificateSecrets
+	
+	# now create a fresh one
+	kubectl get secret tls-rancher -n cattle-system -o jsonpath="{.data.tls\.crt}" | base64 -d  >> ca-additional.pem
+	kubectl create secret generic tls-ca-additional -n cattle-csp-billing-adapter-system --from-file=ca-additional.pem
+}
+
+case "${action}" in
+    (install)
+	echo "Installing Cert-Manager"
+	helm upgrade \
+		--install cert-manager \
+		${charts_dir}/cert-manager \
+		--atomic \
+		--create-namespace \
+		--namespace cert-manager \
+		--set installCRDs=true \
+		${cert_manager_image_args}
+	echo "Cert-Manager successfully installed"
+
+        echo "Installing Rancher"
+	EnsureKubernetesNamespaceExists "cattle-system"
+	helm upgrade \
+		--install rancher ${charts_dir}/rancher \
+		--atomic \
+		--namespace cattle-system \
+		--set installCRDs=true \
+		${rancher_image_args} \
+		${rancher_ingress_class_name_arguments} \
+		--set hostname=${rancher_hostname} \
+		--set bootstrapPassword=${rancher_bootstrap_password} \
+		--set replicas=${rancher_replicas} \
+		--set extraEnv[0].name=CATTLE_SERVER_URL \
+		--set extraEnv[0].value=${rancher_server_url} \
+		--set extraEnv[1].name=CATTLE_PROMETHEUS_METRICS \
+		--set-string extraEnv[1].value=true \
+		--timeout ${helm_timeout}
+        echo "Rancher successfully installed"
+        ;;
+
+    (uninstall)
+        echo "Uninstalling Rancher"
+        helm uninstall rancher -n cattle-system --timeout ${helm_timeout}
+	echo "Rancher successfully uninstalled"
+
+	echo "Uninstalling Cert-Manager"
+	helm uninstall cert-manager -n cert-manager --timeout ${helm_timeout}
+	echo "Cert-Manager successfully uninstalled"
+
+	echo "Cleaning up CA certificate secrets"
+	CleanupRancherCACertificateSecrets
+	echo "CA certificate secretes successfully deleted"
+        ;;
+
+    (upgrade)
+        echo "Upgrade action"
+        ;;
+
+    (status)
+        echo "Status action"
+        ;;
+    (*)
+    echo "No action for $action"
+    ;;
+esac
+echo "Action $action complete for $name"

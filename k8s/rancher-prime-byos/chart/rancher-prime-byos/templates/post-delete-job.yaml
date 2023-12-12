@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "rancher-prime-byos.fullname" . }}-post-delete
+  labels:
+    {{- include "rancher-prime-byos.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-delete
+    "helm.sh/hook-weight": "3"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "rancher-prime-byos.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ template "rancher-prime-byos.fullname" . }}-post-delete
+      restartPolicy: OnFailure
+      containers:
+        - name: {{ template "rancher-prime-byos.name" . }}
+          image: {{ template "rancher-prime-byos.image" . }}
+          imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command:
+            - /installer/app/run
+          env:
+            - name: INSTALLER_ACTION
+              value: "uninstall"
