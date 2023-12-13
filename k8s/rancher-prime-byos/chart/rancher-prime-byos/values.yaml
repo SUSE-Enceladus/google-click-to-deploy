@@ -84,6 +84,6 @@ securityContext:
 
 rancherHostname: rancher.my.org
 rancherServerURL: https://rancher.my.org
-rancherReplicas: 1
+rancherReplicas: 3  # 1 seems to be unstable
 rancherBootstrapPassword: RancherAdmin99
 rancherIngressClassName: none

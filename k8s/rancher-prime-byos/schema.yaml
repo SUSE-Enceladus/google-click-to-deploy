@@ -122,11 +122,11 @@ x-google-marketplace:
 
 clusterConstraints:
   k8sVersion: "<1.27"
-#   resources:
-#     - replicas: 3
-#       requests:
-#         cpu: 2000m
-#         memory: 8192Mi
+  resources:
+    - replicas: 3
+      requests:
+        cpu: 2000m
+        memory: 8192Mi
 #   istio:
 #     type: OPTIONAL
 
@@ -151,7 +151,7 @@ properties:
 
   rancherReplicas:
     type: int
-    default: 1
+    default: 3
 
   rancherBootstrapPassword:
     type: string
