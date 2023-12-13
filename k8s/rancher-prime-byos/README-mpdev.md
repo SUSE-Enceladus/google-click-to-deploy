@@ -40,7 +40,7 @@ Quick and dirty commands used to test the chart:
 	--set rancherServerURL=https://${rancher_host}/ \
 	--set image.pullPolicy=Always \
 	--set rancherReplicas=3 \
-	--set-json global.images.rancher_prime_byos='{"repository": "gcr.io/suse-gce-test", "image": "rancher-prime-byos", "tag": "${rancher_tag}"}'
+	--set-json global.images.rancher_prime_byos='{"repository": "gcr.io/suse-gce-test", "image": "rancher-prime-byos", "tag": "'${rancher_tag}'"}'
 ```
 
 If you have pushed up test images with a different tag suffix than `-gcmp` then just
