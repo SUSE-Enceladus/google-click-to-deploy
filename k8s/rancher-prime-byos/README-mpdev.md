@@ -14,11 +14,14 @@ Ensure that this GKE Cluster is the active cluster.
 
 ## Ensure your GKE Cluster is ready for deploying Click-to-Deploy (C2D) Apps
 
-Run make with no arguments to ensure your GKE Cluster is initialisaed properly.
+Run make with no arguments to ensure your GKE Cluster is initialised properly
+to deploy GKE C2D Applications.
 
 ```shell
 % make
 ```
+
+This will install the Application CRD and other pre-requisites.
 
 ## Test the rancher-prime-byos chart
 
@@ -36,6 +39,8 @@ Quick and dirty commands used to test the chart:
 	--set rancherServerURL=https://${rancher_host}/ \
 	--set image.pullPolicy=Always
 ```
+
+# The following instructions have not yet been validated - DO NOT USE
 
 ## Build the deployer image
 
@@ -74,5 +79,5 @@ RELEASE value when you built the deployer image.
 mpdev install \\
     --deployer=gcr.io/suse-gce-test/rancher/deployer:2.7.9-gcmp \\
     --parameters='{"name": "test-deployment",
-                   "namespace": "rancher"}
+                   "namespace": "rancher"}'
 ```
