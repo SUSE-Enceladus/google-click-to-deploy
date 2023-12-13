@@ -29,9 +29,10 @@ Quick and dirty commands used to test the chart:
 
 ```shell
 % rancher_host=rancher-prime-byos
+% rancher_tag=2.7.9-gcmp
 % kubectl delete namespace rancher
 % make
-% make app/build SOURCE_REGISTRY=gcr.io/suse-gce-test RELEASE=2.7.9-gcmp
+% make app/build SOURCE_REGISTRY=gcr.io/suse-gce-test RELEASE=${rancher_tag}
 % kubectl create namespace rancher
 % helm upgrade --install rancher-installer chart/rancher-prime-byos/ \
 	--namespace rancher \
@@ -39,8 +40,11 @@ Quick and dirty commands used to test the chart:
 	--set rancherServerURL=https://${rancher_host}/ \
 	--set image.pullPolicy=Always \
 	--set rancherReplicas=3 \
-	--set-json global.images.rancher_prime_byos='{"repository": "gcr.io/suse-gce-test", "image": "rancher-prime-byos", "tag": "2.7.9-gcmp"}'
+	--set-json global.images.rancher_prime_byos='{"repository": "gcr.io/suse-gce-test", "image": "rancher-prime-byos", "tag": "${rancher_tag}"}'
 ```
+
+If you have pushed up test images with a different tag suffix than `-gcmp` then just
+update the `rancher_tag` value's suffix to match.
 
 # The following instructions have not yet been validated - DO NOT USE
 
