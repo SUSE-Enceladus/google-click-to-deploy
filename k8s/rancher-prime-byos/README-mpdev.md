@@ -37,7 +37,8 @@ Quick and dirty commands used to test the chart:
 	--namespace rancher \
 	--set rancherHostname=${rancher_host} \
 	--set rancherServerURL=https://${rancher_host}/ \
-	--set image.pullPolicy=Always
+	--set image.pullPolicy=Always \
+	--set rancherReplicas=3
 ```
 
 # The following instructions have not yet been validated - DO NOT USE
