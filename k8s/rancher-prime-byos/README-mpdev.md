@@ -38,7 +38,8 @@ Quick and dirty commands used to test the chart:
 	--set rancherHostname=${rancher_host} \
 	--set rancherServerURL=https://${rancher_host}/ \
 	--set image.pullPolicy=Always \
-	--set rancherReplicas=3
+	--set rancherReplicas=3 \
+	--set-json global.images.rancher_prime_byos='{"repository": "gcr.io/suse-gce-test", "image": "rancher-prime-byos", "tag": "2.7.9-gcmp"}'
 ```
 
 # The following instructions have not yet been validated - DO NOT USE
