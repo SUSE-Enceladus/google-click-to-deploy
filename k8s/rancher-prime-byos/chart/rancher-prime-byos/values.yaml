@@ -84,6 +84,6 @@ securityContext:
 
 rancherHostname: rancher.my.org
 rancherServerURL: https://rancher.my.org
-rancherReplicas: 3  # 1 seems to be unstable
+rancherReplicas: 1
 rancherBootstrapPassword: RancherAdmin99
 rancherIngressClassName: nginx  # we are deploying ingress-nginx
