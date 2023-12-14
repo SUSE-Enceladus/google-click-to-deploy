@@ -5,6 +5,7 @@ FROM marketplace.gcr.io/google/c2d-debian11 AS build
 ARG CHART_NAME
 ARG RANCHER_VERSION
 ARG JETSTACK_VERSION
+ARG INGINX_VERSION
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -16,6 +17,7 @@ COPY installer/charts /tmp/app/charts
 RUN cd /tmp/app/charts && \
     tar -xaf rancher-$RANCHER_VERSION.tgz && \
     tar -xaf cert-manager-v$JETSTACK_VERSION.tgz && \
+    tar -xaf ingress-nginx-$INGINX_VERSION.tgz && \
     rm -f *.tgz
 
 COPY installer/run /tmp/app/run

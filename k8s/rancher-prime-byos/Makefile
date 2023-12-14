@@ -9,6 +9,7 @@ endef
 
 RANCHER_VERSION := 2.7.9
 JETSTACK_VERSION := 1.12.3
+INGINX_VERSION := 4.8.0
 
 CHART_NAME := rancher-prime-byos
 APP_ID ?= $(CHART_NAME)
@@ -54,6 +55,7 @@ INSTALLER_IMAGE_TRACK_TAG ?= $(REGISTRY)/$(APP_ID):$(TRACK)
 INSTALLER_CHARTS_DIR := installer/charts
 RANCHER_CHART_TGZ := $(INSTALLER_CHARTS_DIR)/rancher-$(RANCHER_VERSION).tgz
 JETSTACK_CHART_TGZ := $(INSTALLER_CHARTS_DIR)/cert-manager-v$(JETSTACK_VERSION).tgz
+INGINX_CHART_TGZ := $(INSTALLER_CHARTS_DIR)/ingress-nginx-$(INGINX_VERSION).tgz
 
 installer/build:: .build/installer
 
@@ -68,15 +70,23 @@ $(JETSTACK_CHART_TGZ):
 	$(call print_download,$0)
 	helm pull --destination $(INSTALLER_CHARTS_DIR) --version $(JETSTACK_VERSION) --repo https://charts.jetstack.io cert-manager
 
+$(INGINX_CHART_TGZ):
+	$(call print_download,$0)
+	helm pull --destination $(INSTALLER_CHARTS_DIR) --version $(INGINX_VERSION) --repo https://kubernetes.github.io/ingress-nginx ingress-nginx
+
 .PHONY: .build/RANCHER_TGZ
 .build/RANCHER_TGZ: $(RANCHER_CHART_TGZ)
 
 .PHONY: .build/JETSTACK_TGZ
 .build/JETSTACK_TGZ: $(JETSTACK_CHART_TGZ)
 
+.PHONY: .build/INGINX_TGZ
+.build/INGINX_TGZ: $(INGINX_CHART_TGZ)
+
 .build/installer: installer/run \
                   .build/RANCHER_TGZ \
                   .build/JETSTACK_TGZ \
+                  .build/INGINX_TGZ \
                   .build/var/RANCHER_VERSION \
                   .build/var/JETSTACK_VERSION \
                   .build/var/MARKETPLACE_TOOLS_TAG \
@@ -87,6 +97,7 @@ $(JETSTACK_CHART_TGZ):
 	docker build \
 		--build-arg RANCHER_VERSION="$(RANCHER_VERSION)" \
 		--build-arg JETSTACK_VERSION="$(JETSTACK_VERSION)" \
+		--build-arg INGINX_VERSION="$(INGINX_VERSION)" \
 		--build-arg MARKETPLACE_TOOLS_TAG="$(MARKETPLACE_TOOLS_TAG)" \
 		--tag "$(INSTALLER_IMAGE)" \
 		-f installer/Dockerfile \

@@ -115,7 +115,7 @@ CreateRancherCACertificateSecrets()
 	# cleanup the previously created secret so we create a fresh one every
 	# time, even though they may be the same.
 	CleanupRancherCACertificateSecrets
-	
+
 	# now create a fresh one
 	kubectl get secret tls-rancher -n cattle-system -o jsonpath="{.data.tls\.crt}" | base64 -d  >> ca-additional.pem
 	kubectl create secret generic tls-ca-additional -n cattle-csp-billing-adapter-system --from-file=ca-additional.pem
@@ -123,6 +123,18 @@ CreateRancherCACertificateSecrets()
 
 case "${action}" in
     (install)
+
+	echo "Installing Ingress-Nginx"
+	helm upgrade \
+		--install ingress-nginx \
+		--create-namespace \
+		${charts_dir}/ingress-nginx \
+		--namespace ingress-nginx \
+		--set controller.service.type=LoadBalancer \
+		--set controller.ingressClass=nginx
+
+	echo "Ingress-Nginx successfully installed"
+
 	echo "Installing Cert-Manager"
 	helm upgrade \
 		--install cert-manager \
@@ -151,6 +163,11 @@ case "${action}" in
 		--set extraEnv[1].name=CATTLE_PROMETHEUS_METRICS \
 		--set-string extraEnv[1].value=true \
 		--timeout ${helm_timeout}
+
+	        # This option needed if using GKE ingress rather than
+		# ingress-nginx; remember also to change the ingress
+		# class setting appropriately.
+		#--set service.type=NodePort
         echo "Rancher successfully installed"
         ;;
 

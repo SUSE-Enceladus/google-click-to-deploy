@@ -158,7 +158,7 @@ properties:
 
   rancherIngressClassName:
     type: string
-    default: none
+    default: nginx
 
   serviceAccount.name:
     type: string
