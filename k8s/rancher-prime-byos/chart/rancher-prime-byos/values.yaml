@@ -76,8 +76,7 @@ fullnameOverride: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
-  # create: true
-  create: true
+  create: false  # Google deployer doesn't allow service account/rbac definitions
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.

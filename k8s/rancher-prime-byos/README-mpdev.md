@@ -39,6 +39,7 @@ Quick and dirty commands used to test the chart:
 	--set rancherHostname=${rancher_host} \
 	--set rancherServerURL=https://${rancher_host}/ \
 	--set image.pullPolicy=Always \
+	--set-string serviceAccount.create=true
 	--set rancherReplicas=3 \
 	--set-json global.images.rancher_prime_byos='{"repository": "gcr.io/suse-gce-test", "image": "rancher-prime-byos", "tag": "'${rancher_tag}'"}'
 ```
@@ -46,13 +47,13 @@ Quick and dirty commands used to test the chart:
 If you have pushed up test images with a different tag suffix than `-gcmp` then just
 update the `rancher_tag` value's suffix to match.
 
-# The following instructions have not yet been validated - DO NOT USE
+# The following instructions have not yet been validated - correct as needed
 
 ## Build the deployer image
 
 Build the deployer image you want to test, specifying the tag associated with
 the specific set of Rancher and supporting images as the RELEASE value, e.g.
-`5.2.1-gcmp`, and the build target `app/build`, the make command would look
+`2.7.9-gcmp`, and the build target `app/build`, the make command would look
 like:
 
 ```shell
@@ -67,15 +68,6 @@ Replace the `rancher` namespace with whatever namespace you plan to use:
 % kubectl create namespace rancher
 ```
 
-## Set the pod-security label (Optional?)
-
-Use the name of the previously created namespace instead of `rancher`.
-
-```shell
-% kubectl label namespace rancher \\
-    "pod-security.kubernetes.io/enforce=privileged"
-```
-
 ## Run the mpdev install with appropriate parameters
 
 Replace the `2.7.9-gcmp` tag value below with which tag you used as the
@@ -83,7 +75,7 @@ RELEASE value when you built the deployer image.
 
 ```shell
 mpdev install \\
-    --deployer=gcr.io/suse-gce-test/rancher/deployer:2.7.9-gcmp \\
+    --deployer=gcr.io/suse-gce-test/rancher-prime-byos/deployer:2.7.9-gcmp \\
     --parameters='{"name": "test-deployment",
                    "namespace": "rancher"}'
 ```
