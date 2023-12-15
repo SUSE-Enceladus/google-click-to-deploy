@@ -53,10 +53,10 @@ x-google-marketplace:
         global.images.rancher_auditlog.image:
           type: REPO_WITHOUT_REGISTRY
           default: rancher-prime-byos/mirrored-bci-micro
-        global.images.rancher_postdelete.registry:
+        global.images.rancher_autitlog.registry:
           type: REGISTRY
           default: $REGISTRY
-        global.images.rancher_postdelete.tag:
+        global.images.rancher_autitlog.tag:
           type: TAG
           default: "15.4.14.3"
 
