@@ -9,7 +9,7 @@ RUN apt-get update && \
     gettext
 
 # copy in the chart
-COPY chart /tmp/chart
+COPY chart/rancher-prime-byos /tmp/chart
 RUN cd /tmp && tar -czvf /tmp/$CHART_NAME.tar.gz chart
 
 COPY apptest/deployer/$CHART_NAME /tmp/test/chart
