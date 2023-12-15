@@ -120,6 +120,30 @@ x-google-marketplace:
           type: TAG
           default: v1.12.3
 
+    controller:
+      properties:
+        global.images.ingress_nginx_controller.image:
+          type: REPO_WITHOUT_REGISTRY
+          default: rancher-prime-byos/controller
+        global.images.ingress_nginx_controller.registry:
+          type: REGISTRY
+          default: $REGISTRY
+        global.images.ingress_nginx_controller.tag:
+          type: TAG
+          default: v1.9.0
+
+    kube-webhook-certgen:
+      properties:
+        global.images.kube_webhook_certgen.image:
+          type: REPO_WITHOUT_REGISTRY
+          default: rancher-prime-byos/kube_webhook_certgen
+        global.images.kube_webhook_certgen.registry:
+          type: REGISTRY
+          default: $REGISTRY
+        global.images.kube_webhook_certgen.tag:
+          type: TAG
+          default: v20230407
+
 clusterConstraints:
   k8sVersion: "<1.27"
 #   resources:

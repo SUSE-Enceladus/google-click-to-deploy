@@ -89,6 +89,28 @@ then
         cert_manager_image_args="${cert_manager_image_args} --set startupapicheck.image.tag=${CERT_MANAGER_STARTUPAPICHECK_IMAGE_TAG}"
 fi
 
+ingress_nginx_image_args=
+if [[ -n "${INGRESS_NGINX_CONTROLLER_IMAGE}" ]]
+then
+        ingress_nginx_image_args="${ingress_nginx_image_args} --set controller.image.repository=${INGRESS_NGINX_CONTROLLER_IMAGE}"
+fi
+if [[ -n "${INGRESS_NGINX_CONTROLLER_IMAGE_TAG}" ]]
+then
+        ingress_nginx_image_args="${ingress_nginx_image_args} --set controller.image.tag=${INGRESS_NGINX_CONTROLLER_IMAGE_TAG}"
+	# digest encodes the image path name which doesn't match original from the upstream chart
+        ingress_nginx_image_args="${ingress_nginx_image_args} --set controller.image.digest="
+fi
+if [[ -n "${INGRESS_NGINX_KUBE_WEBHOOK_CERTGEN_IMAGE}" ]]
+then
+        ingress_nginx_image_args="${ingress_nginx_image_args} --set controller.admissionWebhooks.patch.image.repository=${INGRESS_NGINX_KUBE_WEBHOOK_CERTGEN_IMAGE}"
+fi
+if [[ -n "${INGRESS_NGINX_KUBE_WEBHOOK_CERTGEN_IMAGE_TAG}" ]]
+then
+        ingress_nginx_image_args="${ingress_nginx_image_args} --set controller.admissionWebhooks.patch.image.tag=${INGRESS_NGINX_KUBE_WEBHOOK_CERTGEN_IMAGE_TAG}"
+	# digest encodes the image path name which doesn't match original from the upstream chart
+        ingress_nginx_image_args="${ingress_nginx_image_args} --set controller.admissionWebhooks.patch.image.digest="
+fi
+
 HasKubernetesNamespace()
 {       
     kubectl get namespace "${1}" 1>/dev/null 2>/dev/null
@@ -131,7 +153,8 @@ case "${action}" in
 		${charts_dir}/ingress-nginx \
 		--namespace ingress-nginx \
 		--set controller.service.type=LoadBalancer \
-		--set controller.ingressClass=nginx
+		--set controller.ingressClass=nginx \
+		${ingress_nginx_image_args}
 
 	echo "Ingress-Nginx successfully installed"
 

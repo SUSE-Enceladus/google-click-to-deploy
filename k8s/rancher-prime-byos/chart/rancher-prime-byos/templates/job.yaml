@@ -83,6 +83,18 @@ spec:
             - name: CERT_MANAGER_STARTUPAPICHECK_IMAGE_TAG
               value: {{ .Values.global.images.cert_manager_startupapicheck.tag | quote }}
 
+            # ingress-nginx/controller
+            - name: INGRESS_NGINX_CONTROLLER_IMAGE
+              value: "{{ .Values.global.images.ingress_nginx_controller.registry }}/{{ .Values.global.images.ingress_nginx_controller.image }}"
+            - name: INGRESS_NGINX_CONTROLLER_IMAGE_TAG
+              value: {{ .Values.global.images.ingress_nginx_controller.tag | quote }}
+
+            # ingress-nginx/kube-webhook-certgen
+            - name: INGRESS_NGINX_KUBE_WEBHOOK_CERTGEN_IMAGE
+              value: "{{ .Values.global.images.kube_webhook_certgen.registry }}/{{ .Values.global.images.kube_webhook_certgen.image }}"
+            - name: INGRESS_NGINX_KUBE_WEBHOOK_CERTGEN_IMAGE_TAG
+              value: {{ .Values.global.images.kube_webhook_certgen.tag | quote }}
+
 {{- if .Values.rancherHostname }}
             - name: RANCHER_HOSTNAME
               value: {{ .Values.rancherHostname | quote }}

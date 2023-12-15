@@ -50,6 +50,16 @@ global:
       image: rancher-prime-byos/cert-manager-ctl
       tag: v1.12.3
 
+    ingress_nginx_controller:
+      registry: gcr.io/suse-gce-test
+      image: rancher-prime-byos/controller
+      tag: v1.9.0
+
+    kube_webhook_certgen:
+      registry: gcr.io/suse-gce-test
+      image: rancher-prime-byos/kube-webhook-certgen
+      tag: v20230407
+
 
 # NOTE: can be overridden by a global.images.rancher_prime_byos section.
 image:
