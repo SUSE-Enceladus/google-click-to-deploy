@@ -12,6 +12,9 @@ RUN apt-get update && \
 COPY chart/rancher-prime-byos /tmp/chart
 RUN cd /tmp && tar -czvf /tmp/$CHART_NAME.tar.gz chart
 
+COPY tmp/deploy.sh /tmp/deploy.sh
+RUN chmod 755 /tmp/deploy.sh
+
 COPY apptest/deployer/$CHART_NAME /tmp/test/chart
 RUN cd /tmp/test \
     && tar -czvf /tmp/test/$CHART_NAME.tar.gz chart/
@@ -41,6 +44,7 @@ COPY --from=build /tmp/$CHART_NAME.tar.gz /data/chart/
 COPY --from=build /tmp/test/$CHART_NAME.tar.gz /data-test/chart/
 COPY --from=build /tmp/apptest/schema.yaml /data-test/
 COPY --from=build /tmp/schema.yaml /data/
+COPY --from=build /tmp/deploy.sh /bin/
 
 ENV WAIT_FOR_READY_TIMEOUT 1800
 ENV TESTER_TIMEOUT 1800
