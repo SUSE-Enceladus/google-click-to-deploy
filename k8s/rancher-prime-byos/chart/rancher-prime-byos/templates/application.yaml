@@ -11,7 +11,7 @@ metadata:
 spec:
   descriptor:
     type: Rancher
-    version: "{{ .Values.tag }}"
+    version: "{{ .Values.global.images.rancher_prime_byos.tag }}"
     description: |-
       Rancher is an open source Container Security Platform.
       # Support
@@ -42,18 +42,23 @@ spec:
 
       Check out our docs at https://rancher.com/docs/
 
-      If you provided your own bootstrap password during installation, browse to https://${CLUSTER_NAME} to get started.
+      To get the address of the load balancer:
+      ```shell
+      kubectl get service ingress-nginx-controller --namespace=ingress-nginx
+      ```
+      External traffic to the rancher server will need to be directed at the load balancer.
+      Set up a DNS for ${RANCHER_HOSTNAME} to point to the EXTERNAL-IP.
 
       If this is the first time you installed Rancher, get started by running this command and clicking the URL it generates:
 
       ```shell
-      echo https://${CLUSTER_NAME}/dashboard/?setup=\$\(kubectl get secret --namespace {{ .Release.Namespace }} bootstrap-secret -o go-template='\{\{.data.bootstrapPassword|base64decode\}\}'\)
+      echo https://${RANCHER_HOSTNAME}/dashboard/?setup=\$\(kubectl get secret --namespace cattle-system bootstrap-secret -o go-template='\{\{.data.bootstrapPassword|base64decode\}\}'\)
       ```
 
       To get just the bootstrap password on its own, run:
 
       ```shell
-      kubectl get secret --namespace {{ .Release.Namespace }} bootstrap-secret -o go-template='\{\{.data.bootstrapPassword|base64decode\}\}'
+      kubectl get secret --namespace cattle-system bootstrap-secret -o go-template='\{\{.data.bootstrapPassword|base64decode\}\}'
       ```
 
   info:
@@ -64,12 +69,6 @@ spec:
         name: "{{ .Release.Name }}-rancher"
   - name: rancher console username
     value: admin
-  - name: rancher console password
-    type: Reference
-    valueFrom:
-      secretKeyRef:
-        key: console-password
-        name: "{{ .Release.Name }}-rancher-secret"
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ .Release.Name }}
