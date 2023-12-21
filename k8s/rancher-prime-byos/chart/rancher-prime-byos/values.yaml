@@ -69,14 +69,13 @@ image:
   # tag: "latest"
   tag: "2.7"
 
-
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: false  # Google deployer doesn't allow service account/rbac definitions
+  create: true
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -94,5 +93,5 @@ securityContext:
 rancherHostname: rancher.my.org
 rancherServerURL: https://rancher.my.org
 rancherReplicas: 1
-rancherBootstrapPassword: RancherAdmin99
-rancherIngressClassName: nginx  # we are deploying ingress-nginx
+#rancherBootstrapPassword: RancherAdmin99 # if we do not specify this, rancher will generate a bootstrap password
+rancherIngressClassName: nginx # we are deploying ingress-nginx

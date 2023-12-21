@@ -17,7 +17,7 @@
 set -xeo pipefail
 shopt -s nullglob
 
-echo "INFO: Start NV deploy tests"
+echo "INFO: Start Rancher deploy tests"
 
 for test in /tests/*; do
   testrunner -logtostderr "--test_spec=${test}"

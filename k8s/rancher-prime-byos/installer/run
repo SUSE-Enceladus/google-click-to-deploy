@@ -11,7 +11,7 @@ name=${INSTALLATION_NAME:-rancher-prime-byos}
 rancher_hostname=${RANCHER_HOSTNAME:-rancher.my.org}
 rancher_server_url=${RANCHER_SERVER_URL:-https://${rancher_hostname}}
 rancher_replicas=${RANCHER_REPLICAS:-1}
-rancher_bootstrap_password=${RANCHER_BOOTSTRAP_PASSWORD:-RancherAdmin99}
+#rancher_bootstrap_password=${RANCHER_BOOTSTRAP_PASSWORD:-RancherAdmin99}
 
 helm_timeout=20m
 
@@ -179,7 +179,6 @@ case "${action}" in
 		${rancher_image_args} \
 		${rancher_ingress_class_name_arguments} \
 		--set hostname=${rancher_hostname} \
-		--set bootstrapPassword=${rancher_bootstrap_password} \
 		--set replicas=${rancher_replicas} \
 		--set extraEnv[0].name=CATTLE_SERVER_URL \
 		--set extraEnv[0].value=${rancher_server_url} \

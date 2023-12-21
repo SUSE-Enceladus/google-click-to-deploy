@@ -8,7 +8,7 @@ x-google-marketplace:
     releaseNote: >-
       Initial marketplace release.
     releaseTypes:
-      - Feature
+    - Feature
     recommended: false
 
   images:
@@ -146,13 +146,132 @@ x-google-marketplace:
 
   deployerServiceAccount:
     description: >
-      Runs the Rancher cloud installer, setting up the required
-      services.
+      Runs the Rancher cloud installer, setting up the required services.
     roles:
-    # NOTE: Placeholder definition, please update/remove as appropriate
     - type: ClusterRole
-      rulesType: PREDEFINED
-      rulesFromRoleName: view
+      rulesType: CUSTOM
+      rules:
+      - apiGroups: [""]
+        resources: ["applications", "bindings", "componentstatuses", "configmaps", "endpoints", "events", "limitranges", "namespaces", "nodes", "persistentvolumeclaims", "persistentvolumes", "pods", "podtemplates", "replicationcontrollers", "resourcequotas", "secrets", "serviceaccounts", "services"]
+        verbs: ["*"]
+      - apiGroups: ["acme.cert-manager.io"]
+        resources: ["challenges", "orders"]
+        verbs: ["*"]
+      - apiGroups: ["admissionregistration.k8s.io"]
+        resources: ["mutatingwebhookconfigurations", "validatingwebhookconfigurations"]
+        verbs: ["*"]
+      - apiGroups: ["apiextensions.k8s.io"]
+        resources: ["customresourcedefinitions"]
+        verbs: ["*"]
+      - apiGroups: ["apiregistration.k8s.io"]
+        resources: ["apiservices"]
+        verbs: ["*"]
+      - apiGroups: ["apps"]
+        resources: ["controllerrevisions", "daemonsets", "deployments", "replicasets", "statefulsets"]
+        verbs: ["*"]
+      - apiGroups: ["authentication.k8s.io"]
+        resources: ["tokenreviews"]
+        verbs: ["*"]
+      - apiGroups: ["authorization.k8s.io"]
+        resources: ["localsubjectaccessreviews", "selfsubjectaccessreviews", "selfsubjectrulesreviews", "subjectaccessreviews"]
+        verbs: ["*"]
+      - apiGroups: ["autoscaling"]
+        resources: ["horizontalpodautoscalers"]
+        verbs: ["*"]
+      - apiGroups: ["batch"]
+        resources: ["cronjobs", "jobs"]
+        verbs: ["*"]
+      - apiGroups: ["catalog.cattle.io"]
+        resources: ["apps", "clusterrepos", "operations"]
+        verbs: ["*"]
+      - apiGroups: ["cert-manager.io"]
+        resources: ["certificaterequests", "certificates", "clusterissuers", "issuers"]
+        verbs: ["*"]
+      - apiGroups: ["certificates.k8s.io"]
+        resources: ["certificatesigningrequests"]
+        verbs: ["*"]
+      - apiGroups: ["cluster.x-k8s.io"]
+        resources: ["clusters", "machinedeployments", "machinehealthchecks", "machines", "machinesets"]
+        verbs: ["*"]
+      - apiGroups: ["coordination.k8s.io"]
+        resources: ["leases"]
+        verbs: ["*"]
+      - apiGroups: ["crd.projectcalico.org"]
+        resources: ["bgpconfigurations", "bgppeers", "blockaffinities", "caliconodestatuses", "clusterinformations", "felixconfigurations", "globalnetworkpolicies", "globalnetworksets", "hostendpoints", "ipamblocks", "ipamconfigs", "ipamhandles", "ippools", "ipreservations", "kubecontrollersconfigurations", "networkpolicies", "networksets"]
+        verbs: ["*"]
+      - apiGroups: ["discovery.k8s.io"]
+        resources: ["endpointslices"]
+        verbs: ["*"]
+      - apiGroups: ["events.k8s.io"]
+        resources: ["events"]
+        verbs: ["*"]
+      - apiGroups: ["fleet.cattle.io"]
+        resources: ["bundledeployments", "bundlenamespacemappings", "bundles", "clustergroups", "clusterregistrations", "clusterregistrationtokens", "clusters", "contents", "gitreporestrictions", "gitrepos", "imagescans"]
+        verbs: ["*"]
+      - apiGroups: ["flowcontrol.apiserver.k8s.io"]
+        resources: ["flowschemas", "prioritylevelconfigurations"]
+        verbs: ["*"]
+      - apiGroups: ["gitjob.cattle.io"]
+        resources: ["gitjobs"]
+        verbs: ["*"]
+      - apiGroups: ["helm.cattle.io"]
+        resources: ["helmchartconfigs", "helmcharts"]
+        verbs: ["*"]
+      - apiGroups: ["k3s.cattle.io"]
+        resources: ["addons"]
+        verbs: ["*"]
+      - apiGroups: ["management.cattle.io"]
+        resources: ["apiservices", "authconfigs", "catalogs", "catalogtemplates", "catalogtemplateversions", "clusteralertgroups", "clusteralertrules", "clusteralerts", "clustercatalogs", "clustermonitorgraphs", "clusterregistrationtokens", "clusterroletemplatebindings", "clusters", "clustertemplaterevisions", "clustertemplates", "composeconfigs", "dynamicschemas", "etcdbackups", "features", "fleetworkspaces", "globaldnses", "globaldnsproviders", "globalrolebindings", "globalroles", "groupmembers", "groups", "kontainerdrivers", "managedcharts", "monitormetrics", "multiclusterapprevisions", "multiclusterapps", "nodedrivers", "nodepools", "nodes", "nodetemplates", "notifiers", "podsecurityadmissionconfigurationtemplates", "podsecuritypolicytemplateprojectbindings", "podsecuritypolicytemplates", "preferences", "projectalertgroups", "projectalertrules", "projectalerts", "projectcatalogs", "projectmonitorgraphs", "projectnetworkpolicies", "projectroletemplatebindings", "projects", "rancherusernotifications", "rkeaddons", "rkek8sserviceoptions", "rkek8ssystemimages", "roletemplates", "samltokens", "settings", "templatecontents", "templates", "templateversions", "tokens", "userattributes", "users"]
+        verbs: ["*"]
+      - apiGroups: ["metrics.k8s.io"]
+        resources: ["nodes", "pods"]
+        verbs: ["*"]
+      - apiGroups: ["monitoring.coreos.com"]
+        resources: ["alertmanagers", "prometheuses", "prometheusrules", "servicemonitors"]
+        verbs: ["*"]
+      - apiGroups: ["networking.k8s.io"]
+        resources: ["ingressclasses", "ingresses", "networkpolicies"]
+        verbs: ["*"]
+      - apiGroups: ["node.k8s.io"]
+        resources: ["runtimeclasses"]
+        verbs: ["*"]
+      - apiGroups: ["policy"]
+        resources: ["poddisruptionbudgets"]
+        verbs: ["*"]
+      - apiGroups: ["policy"]
+        resources: ["podsecuritypolicies"]
+        verbs: ["*"]
+      - apiGroups: ["project.cattle.io"]
+        resources: ["apprevisions", "apps"]
+        verbs: ["*"]
+      - apiGroups: ["provisioning.cattle.io"]
+        resources: ["clusters"]
+        verbs: ["*"]
+      - apiGroups: ["rbac.authorization.k8s.io"]
+        resources: ["clusterrolebindings", "clusterroles", "rolebindings", "roles"]
+        verbs: ["*"]
+      - apiGroups: ["rke-machine-config.cattle.io"]
+        resources: ["amazonec2configs", "azureconfigs", "digitaloceanconfigs", "harvesterconfigs", "linodeconfigs", "vmwarevsphereconfigs"]
+        verbs: ["*"]
+      - apiGroups: ["rke-machine.cattle.io"]
+        resources: ["amazonec2machines", "amazonec2machinetemplates", "azuremachines", "azuremachinetemplates", "digitaloceanmachines", "digitaloceanmachinetemplates", "harvestermachines", "harvestermachinetemplates", "linodemachines", "linodemachinetemplates", "vmwarevspheremachines", "vmwarevspheremachinetemplates"]
+        verbs: ["*"]
+      - apiGroups: ["rke.cattle.io"]
+        resources: ["custommachines", "etcdsnapshots", "rkebootstraps", "rkebootstraptemplates", "rkeclusters", "rkecontrolplanes"]
+        verbs: ["*"]
+      - apiGroups: ["scheduling.k8s.io"]
+        resources: ["priorityclasses"]
+        verbs: ["*"]
+      - apiGroups: ["storage.k8s.io"]
+        resources: ["csidrivers", "csinodes", "csistoragecapacities", "storageclasses", "volumeattachments"]
+        verbs: ["*"]
+      - apiGroups: ["susecloud.net"]
+        resources: ["cspadapterusagerecords"]
+        verbs: ["*"]
+      - apiGroups: ["ui.cattle.io"]
+        resources: ["navlinks"]
+        verbs: ["*"]
+
 
 clusterConstraints:
   k8sVersion: "<1.27"
@@ -179,35 +298,23 @@ properties:
 
   rancherHostname:
     type: string
+    default: rancher.my.org
 
   rancherServerURL:
     type: string
+    default: https://rancher.my.org
 
   rancherReplicas:
     type: int
     default: 1
 
-  rancherBootstrapPassword:
-    type: string
+  # Rancher will generate the bootstrap password
+  #rancherBootstrapPassword:
+  #  type: string
 
   rancherIngressClassName:
     type: string
     default: nginx
-
-  serviceAccount.name:
-    type: string
-    title: Rancher Service Account
-    default: rancher-prime-byos-sa
-    x-google-marketplace:
-      type: SERVICE_ACCOUNT
-      serviceAccount:
-        description: >
-          Manages cluster wide resources
-        roles:
-        # NOTE: Placeholder definition, please update/remove as appropriate
-        - type: ClusterRole
-          rulesType: PREDEFINED
-          rulesFromRoleName: view
 
 required:
 - name

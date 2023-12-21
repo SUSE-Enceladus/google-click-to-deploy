@@ -32,7 +32,7 @@ available in Google Cloud Marketplace.
 
 ## Quick install with Google Cloud Marketplace
 
-Get up and running with a few clicks! Install this Neuvector-prime to a
+Get up and running with a few clicks! Install this rancher-prime to a
 Google Kubernetes Engine cluster using Google Cloud Marketplace. Follow the
 [on-screen instructions](https://console.cloud.google.com/marketplace/details/google/sample-app).
 
@@ -42,7 +42,6 @@ You can use [Google Cloud Shell](https://cloud.google.com/shell/) or a local
 workstation to follow the steps below.
 
 [![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/SUSE-Enceladus/google-click-to-deploy&cloudshell_git_branch=doc-update&cloudshell_open_in_editor=README.md&cloudshell_working_dir=k8s/rancher)
->>>>>>> Stashed changes
 
 #### Set up command line tools
 
@@ -115,7 +114,7 @@ gcloud container clusters get-credentials "$CLUSTER" --zone "$ZONE"
 Clone this repo and the associated tools repo:
 
 ```shell
-git clone --recursive -b doc-update https://github.com/SUSE-Enceladus/google-click-to-deploy.git
+git clone --recursive -b google_rancher_byos https://github.com/SUSE-Enceladus/google-click-to-deploy.git
 ```
 
 #### Install the Application resource definition
@@ -139,10 +138,10 @@ community. The source code can be found on
 
 ### Install the Application
 
-Navigate to the `neuvctor` directory:
+Navigate to the `rancher-prime-byos` directory:
 
 ```shell
-cd google-click-to-deploy/k8s/rancher
+cd google-click-to-deploy/k8s/rancher-prime-byos
 ```
 
 #### Configure the app with environment variables
@@ -153,7 +152,7 @@ for the app. In most cases, you can use the `default` namespace.
 
 ```shell
 export APP_INSTANCE_NAME=rancher-prime-byos
-export NV_NAME_SPACE=rancher
+export NAMESPACE=rancher
 ```
 
 Set up the image tag:
@@ -177,46 +176,44 @@ Configure the container images:
 
 ```shell
 export IMAGE_RANCHER-PRIME="marketplace.gcr.io/google/rancher-prime-byos"
-export IMAGE_RANCHER-PRIME_INIT="marketplace.gcr.io/google/rancher-prime-byos/init"
+#export IMAGE_RANCHER-PRIME_INIT="marketplace.gcr.io/google/rancher-prime-byos/init"
 ```
 
-#### Create a and set up namespace in your Kubernetes cluster
+#### Create and set up a namespace in your Kubernetes cluster
 
 If you use a different namespace than `default`, run the command below to create
 a new namespace:
 
 ```shell
 # create namespace
-kubectl create namespace ${NV_NAME_SPACE}
+kubectl create namespace ${NAMESPACE}
 
 # label and set priv on namespace
-kubectl label namespace ${NV_NAME_SPACE} "pod-security.kubernetes.io/enforce=privileged"
+#kubectl label namespace ${NAMESPACE} "pod-security.kubernetes.io/enforce=privileged"
 
 
 # install secret
-gsutil cp gs://cloud-marketplace-tools/reporting_secrets/fake_reporting_secret.yaml /tmp/.
-echo "metadata: {name: fake-reporting-secret}" >> /tmp/fake_reporting_secret.yaml
-kubectl apply -n ${NV_NAME_SPACE} -f /tmp/fake_reporting_secret.yaml
+#gsutil cp gs://cloud-marketplace-tools/reporting_secrets/fake_reporting_secret.yaml /tmp/.
+#echo "metadata: {name: fake-reporting-secret}" >> /tmp/fake_reporting_secret.yaml
+#kubectl apply -n ${NAMESPACE} -f /tmp/fake_reporting_secret.yaml
 
-# set admin account secret
-PASSWORD=Admin1234 envsubst <userinitcfg.yaml.template >/tmp/userinitcfg.yaml
-
-kubectl create secret generic rancher-init --from-file=/tmp/userinitcfg.yaml -n ${NV_NAME_SPACE}
 
 ```
-
 
 #### Expand the manifest template
 
 Use `helm template` to expand the template. We recommend that you save the
 expanded manifest file for future updates to the application.
+Please set the parameters, rancherHostname, rancherServerURL, rancherReplicas per your environment.
 
 ```shell
-helm template chart/rancher-prime \
-  --name "$APP_INSTANCE_NAME" \
+export RANCHER_HOSTNAME="rancher.myorg.org"
+
+helm template "$APP_INSTANCE_NAME" chart/rancher-prime-byos \
   --namespace "$NAMESPACE" \
-:
-:
+  --set rancherHostname="$RANCHER_HOSTNAME" \
+  --set rancherServerURL="https://$RANCHER_HOSTNAME" \
+  --set rancherReplicas=1 \
   > "${APP_INSTANCE_NAME}_manifest.yaml"
 ```
 
@@ -240,37 +237,49 @@ To view your app, open the URL in your browser.
 
 # Using the app
 
-You can get the IP addresses for Neuvector Console from:
+To get the address of the load balancer:
+```shell
+kubectl get service ingress-nginx-controller --namespace=ingress-nginx
+```
+External traffic to the rancher server will need to be directed at the load balancer. Set up a DNS entry for ${RANCHER_HOSTNAME} to point to the EXTERNAL-IP.
 
-  SERVICE_IP=$(kubectl get svc --namespace ${NV_NAME_SPACE} rancher-service-webui -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
-  echo https://$SERVICE_IP:8443
+Using the browser, you can access rancher at https://${RANCHER_HOSTNAME}
 
-Use browser to access console at IP and port returned.
+If this is the first time you installed Rancher, get started by running this command and clicking the URL it generates:
 
+```shell
+echo https://${RANCHER_HOSTNAME}/dashboard/?setup=\$\(kubectl get secret --namespace cattle-system bootstrap-secret -o go-template='\{\{.data.bootstrapPassword|base64decode\}\}'\)
+```
 
+To get just the bootstrap password on its own, run:
+
+```shell
+kubectl get secret --namespace cattle-system bootstrap-secret -o go-template='{{.data.bootstrapPassword|base64decode}}{{"\n"}}'
+```
 
 ## Using the Google Cloud Platform Console
 
 1.  In the GCP Console, open
     [Kubernetes Applications](https://console.cloud.google.com/kubernetes/application).
 
-1.  From the list of applications, click **Neuvector-prime**.
+1.  From the list of applications, click **rancher-prime-byos**.
 
 1.  On the Application Details page, click **Delete**.
 
 ## Using the command line
 
-1.  Navigate to the `rancher-prime` directory.
+1.  Navigate to the `rancher-prime-byos` directory.
 
     ```shell
-    cd click-to-deploy/k8s/rancher
+    cd click-to-deploy/k8s/rancher-prime-byos
     ```
 
-1.  Run the `kubectl delete` command:
+2.  Run the `kubectl delete` command:
 
     ```shell
     kubectl delete -f ${APP_INSTANCE_NAME}_manifest.yaml --namespace $NAMESPACE
     ```
+Note: There is a issue with delete. 
 
 Optionally, if you don't need the deployed application or the Kubernetes Engine
 cluster, delete the cluster using this command:
