@@ -130,7 +130,7 @@ x-google-marketplace:
           default: $REGISTRY
         global.images.ingress_nginx_controller.tag:
           type: TAG
-          default: v1.9.0
+          default: v1.9.5
 
     kube-webhook-certgen:
       properties:
