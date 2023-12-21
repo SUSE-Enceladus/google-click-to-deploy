@@ -273,8 +273,8 @@ x-google-marketplace:
         verbs: ["*"]
 
 
-clusterConstraints:
-  k8sVersion: "<1.27"
+#clusterConstraints:
+#  k8sVersion: "<1.27"
 #   resources:
 #     - replicas: 3
 #       requests:
@@ -305,7 +305,7 @@ properties:
     default: https://rancher.my.org
 
   rancherReplicas:
-    type: int
+    type: integer
     default: 1
 
   # Rancher will generate the bootstrap password
