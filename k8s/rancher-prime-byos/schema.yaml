@@ -11,6 +11,18 @@ x-google-marketplace:
     - Feature
     recommended: false
 
+  clusterConstraints:
+    k8sVersion: "<1.27.0"
+
+  #clusterConstraints:
+  #  k8sVersion: "<1.27"
+  #   resources:
+  #     - replicas: 3
+  #       requests:
+  #         cpu: 2000m
+  #         memory: 8192Mi
+  #   istio:
+  #     type: OPTIONAL
   images:
     '':
       properties:
@@ -53,10 +65,10 @@ x-google-marketplace:
         global.images.rancher_auditlog.image:
           type: REPO_WITHOUT_REGISTRY
           default: rancher-prime-byos/mirrored-bci-micro
-        global.images.rancher_autitlog.registry:
+        global.images.rancher_auditlog.registry:
           type: REGISTRY
           default: $REGISTRY
-        global.images.rancher_autitlog.tag:
+        global.images.rancher_auditlog.tag:
           type: TAG
           default: "15.4.14.3"
 
@@ -271,17 +283,6 @@ x-google-marketplace:
       - apiGroups: ["ui.cattle.io"]
         resources: ["navlinks"]
         verbs: ["*"]
-
-
-#clusterConstraints:
-#  k8sVersion: "<1.27"
-#   resources:
-#     - replicas: 3
-#       requests:
-#         cpu: 2000m
-#         memory: 8192Mi
-#   istio:
-#     type: OPTIONAL
 
 properties:
   name:
