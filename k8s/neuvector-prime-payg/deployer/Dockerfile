@@ -13,7 +13,7 @@ RUN apt-get update \
 COPY tools/set-up-chart .
 RUN mkdir chart
 COPY chart ./chart
-RUN bash ./set-up-chart https://github.com/SUSE-Enceladus/neuvector-helm-gks.git payg $CHART_NAME
+RUN bash ./set-up-chart https://github.com/SUSE-Enceladus/neuvector-helm-gks.git payg-bootstrap $CHART_NAME
 
 RUN cd /tmp && tar -czvf /tmp/$CHART_NAME.tar.gz chart
 
