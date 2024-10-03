@@ -1,0 +1,6 @@
+dependencies:
+- name: core
+  repository: file:///home/smarlow/projects/neuvector-helm-gks/charts/core
+  version: 2.7.8
+digest: sha256:7d91cb54eb3ab244f62f0817212a387863af49a2911e94ccdd6a63cd49958da5
+generated: "2024-09-05T14:02:47.903327585-04:00"

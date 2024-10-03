@@ -3,7 +3,7 @@ x-google-marketplace:
 
   applicationApiVersion: v1beta1
 
-  publishedVersion: "$TAG"
+  publishedVersion: '$TAG'
   publishedVersionMetadata:
     releaseNote: >-
       Initial marketplace release.
@@ -12,29 +12,43 @@ x-google-marketplace:
     recommended: false
 
   images:
-    #controller:
-    '':
+    controller:
+      #'':
       properties:
         registry:
           type: REGISTRY
           default: $REGISTRY
-        tag:
+        core.tag:
           type: TAG
-        controller.image.repository:
+        core.controller.image.repository:
           type: REPO_WITHOUT_REGISTRY
 
     enforcer:
       properties:
-        enforcer.image.repository:
+        core.enforcer.image.repository:
           type: REPO_WITHOUT_REGISTRY
-        controller.image.tag:
+        core.enforcer.image.tag:
           type: TAG
 
     manager:
       properties:
-        manager.image.repository:
+        core.manager.image.repository:
           type: REPO_WITHOUT_REGISTRY
-        manager.image.tag:
+        core.manager.image.tag:
+          type: TAG
+
+    updater:
+      properties:
+        core.cve.updater.image.repository:
+          type: REPO_WITHOUT_REGISTRY
+        core.cve.updater.image.tag:
+          type: TAG
+
+    scanner:
+      properties:
+        core.cve.scanner.image.repository:
+          type: REPO_WITHOUT_REGISTRY
+        core.cve.scanner.image.tag:
           type: TAG
 
 # clusterConstraints:
@@ -56,8 +70,84 @@ properties:
     default: neuvector
     x-google-marketplace:
       type: NAMESPACE
-
-  serviceAccount:
+  core.bootstrapPassword:
+    title: User-specified admin password
+    description: The password to be used for admin login.
+    maxLength: 32
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+  core.global.gcloud.serviceAccount:
+    type: string
+    title: Neuvector CSP Adapter Service Account
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        description: >
+          Manages CSP Adapter resources
+        roles:
+        - type: ClusterRole
+          metadata:
+            name: neuvector-csp-adapter-cluster-role
+          rulesType: CUSTOM
+          rules:
+          - apiGroups: ["susecloud.net"]
+            resources:
+            - "cspadapterusagerecords"
+            resourceNames:
+            - "neuvector-usage"
+            verbs:
+            - "get"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-csp-usages
+          rulesType: CUSTOM
+          rules:
+          - apiGroups: ["susecloud.net"]
+            resources:
+            - "cspadapterusagerecords"
+            verbs:
+            - "get"
+            - "create"
+            - "update"
+            - "delete"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-csp-adapter-role
+          rulesType: CUSTOM
+          rules:
+          - apiGroups: [""]
+            resources:
+            - "secrets"
+            resourceNames:
+            - "csp-adapter-cache"
+            verbs:
+            - "*"
+          - apiGroups: [""]
+            resources:
+            - "secrets"
+            verbs:
+            - "create"
+          - apiGroups: [""]
+            resources:
+            - "configmaps"
+            resourceNames:
+            - "csp-config"
+            verbs:
+            - "*"
+          - apiGroups: [""]
+            resources:
+            - "configmaps"
+            resourceNames:
+            - "metering-archive"
+            verbs:
+            - "*"
+          - apiGroups: [""]
+            resources:
+            - "configmaps"
+            verbs:
+            - "create"
+  core.serviceAccount:
     type: string
     title: Neuvector Service Account
     x-google-marketplace:
@@ -67,183 +157,264 @@ properties:
           Manages cluster wide resources
         roles:
         - type: ClusterRole
+          metadata:
+            name: neuvector-binding-rbac
+          rulesType: CUSTOM
+          rules:
+          - apiGroups: ["rbac.authorization.k8s.io"]
+            resources:
+            - "rolebindings"
+            - "roles"
+            - "clusterrolebindings"
+            - "clusterroles"
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+          - apiGroups: ["image.openshift.io"]
+            resources:
+            - "imagestreams"
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-app
           rulesType: CUSTOM
           rules:
 
           - apiGroups: [""]
             resources:
-            - "namespaces"
             - "nodes"
             - "pods"
             - "services"
+            - "namespaces"
 
             verbs:
             - "get"
             - "list"
             - "watch"
             - "update"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-admission
+          rulesType: CUSTOM
+          rules:
 
-          - apiGroups: [""]
+          - apiGroups: ["admissionregistration.k8s.io"]
             resources:
-            - "bindings"
-            - "configmaps"
-            - "endpoints"
-            - "events"
-            - "limitranges"
-            - "namespaces/status"
-            - "persistentvolumeclaims"
-            - "persistentvolumeclaims/status"
-            - "pods/log"
-            - "pods/status"
-            - "replicationcontrollers"
-            - "replicationcontrollers/scale"
-            - "replicationcontrollers/status"
-            - "resourcequotas"
-            - "resourcequotas/status"
-            - "serviceaccounts"
-            - "services/status"
+            - "validatingwebhookconfigurations"
+            - "mutatingwebhookconfigurations"
+
             verbs:
             - "get"
             - "list"
             - "watch"
+            - "create"
+            - "update"
+            - "delete"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-co
+          rulesType: CUSTOM
+          rules:
+
+          - apiGroups: ["config.openshift.io"]
+            resources:
+            - "clusteroperators"
+
+            verbs:
+            - "get"
+            - "list"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-customresourcedefinition
+          rulesType: CUSTOM
+          rules:
 
           - apiGroups: ["apiextensions.k8s.io"]
             resources:
             - "customresourcedefinitions"
-            verbs: ['*']
 
-          - apiGroups: ["admissionregistration.k8s.io"]
-            resources:
-            - "mutatingwebhookconfigurations"
-            - "validatingwebhookconfigurations"
             verbs:
-            - "get"
-            - "list"
-            - "watch"
-            - "create"
             - "update"
-            - "delete"
-            - "patch"
-
-          - apiGroups: ["discovery.k8s.io"]
-            resources:
-            - "endpointslices"
-            verbs:
-            - "get"
-            - "list"
-            - "watch"
-
-          - apiGroups: ["networking.k8s.io"]
-            resources:
-            - "ingresses"
-            - "ingresses/status"
-            - "networkpolicies"
-            verbs:
-            - "get"
-            - "list"
-            - "watch"
-
-          - apiGroups: ["rbac.authorization.k8s.io"]
-            resources:
-            - "clusterrolebindings"
-            - "clusterroles"
-            - "rolebindings"
-            - "roles"
-            verbs:
-            - "get"
-            - "list"
             - "watch"
             - "create"
-            - "patch"
+            - "get"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-nvsecurityrules
+          rulesType: CUSTOM
+          rules:
+
+          - apiGroups: ["neuvector.com"]
+            resources:
+            - "nvsecurityrules"
+            - "nvclustersecurityrules"
+
+            verbs:
+            - "get"
+            - "list"
+            - "delete"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-nvdlpsecurityrules
+          rulesType: CUSTOM
+          rules:
+
+          - apiGroups: ["neuvector.com"]
+            resources:
+            - "nvdlpsecurityrules"
+
+            verbs:
+            - "get"
+            - "list"
+            - "delete"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-nvadmissioncontrolsecurityrules
+          rulesType: CUSTOM
+          rules:
 
           - apiGroups: ["neuvector.com"]
             resources:
             - "nvadmissioncontrolsecurityrules"
+
+            verbs:
+            - "get"
+            - "list"
+            - "delete"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-nvwafsecurityrules
+          rulesType: CUSTOM
+          rules:
+
+          - apiGroups: ["neuvector.com"]
+            resources:
             - "nvwafsecurityrules"
-            - "nvclustersecurityrules"
-            - "nvdlpsecurityrules"
-            - "nvsecurityrules"
+
             verbs:
             - "get"
             - "list"
             - "delete"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-nvcomplianceprofiles
+          rulesType: CUSTOM
+          rules:
 
-          - apiGroups: ["susecloud.net"]
+          - apiGroups: ["neuvector.com"]
             resources:
-            - "cspadapterusagerecords"
+            - "nvcomplianceprofiles"
+
             verbs:
             - "get"
+            - "list"
+            - "delete"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-nvvulnerabilityprofiles
+          rulesType: CUSTOM
+          rules:
+
+          - apiGroups: ["neuvector.com"]
+            resources:
+            - "nvvulnerabilityprofiles"
+
+            verbs:
+            - "get"
+            - "list"
+            - "delete"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-secret
+          rulesType: CUSTOM
+          rules:
+
+          - apiGroups: [""]
+            resources:
+            - "secrets"
+
+            verbs:
+            - "get"
+            - "list"
+            - "watch"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-lease
+          rulesType: CUSTOM
+          rules:
+
+          - apiGroups: ["coordination.k8s.io"]
+            resources:
+            - "leases"
+
+            verbs:
             - "create"
+            - "get"
             - "update"
-            - "delete"
-            - "patch"
-
-          - apiGroups: ["apps"]
-            resources:
-            - "controllerrevisions"
-            - "daemonsets"
-            - "daemonsets/status"
-            - "deployments"
-            - "deployments/scale"
-            - "deployments/status"
-            - "replicasets"
-            - "replicasets/scale"
-            - "replicasets/status"
-            - "statefulsets"
-            - "statefulsets/scale"
-            - "statefulsets/status"
-            verbs:
-            - "get"
-            - "list"
-            - "watch"
-
-          - apiGroups: ["autoscaling"]
-            resources:
-            - "horizontalpodautoscalers"
-            - "horizontalpodautoscalers/status"
-            verbs:
-            - "get"
-            - "list"
-            - "watch"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-job-creation
+          rulesType: CUSTOM
+          rules:
 
           - apiGroups: ["batch"]
             resources:
-            - "cronjobs"
-            - "cronjobs/status"
             - "jobs"
-            - "jobs/status"
+
+            verbs:
+            - "create"
+            - "get"
+            - "delete"
+          - apiGroups: ["batch"]
+            resources:
+            - "cronjobs"
+            - "cronjobs/finalizers"
+
+            verbs:
+            - "update"
+            - "patch"
+        - type: ClusterRole
+          metadata:
+            name: neuvector-binding-cert-upgrader
+          rulesType: CUSTOM
+          rules:
+
+          - apiGroups: [""]
+            resources:
+            - "secrets"
+
+            verbs:
+            - "get"
+            - "update"
+            - "list"
+            - "watch"
+          - apiGroups: [""]
+            resources:
+            - "pods"
+
             verbs:
             - "get"
             - "list"
-            - "watch"
-
-          - apiGroups: ["extensions"]
+          - apiGroups: ["apps"]
             resources:
-            - "daemonsets"
-            - "daemonsets/status"
             - "deployments"
-            - "deployments/scale"
-            - "deployments/status"
-            - "ingresses"
-            - "ingresses/status"
-            - "networkpolicies"
-            - "replicasets"
-            - "replicasets/scale"
-            - "replicasets/status"
-            - "replicationcontrollers/scale"
-            verbs:
-            - "get"
-            - "list"
-            - "watch"
+            - "daemonsets"
 
-          - apiGroups: ["policy"]
-            resources:
-            - "poddisruptionbudgets"
-            - "poddisruptionbudgets/status"
             verbs:
             - "get"
             - "list"
             - "watch"
+          - apiGroups: ["batch"]
+            resources:
+            - "cronjobs"
+
+            verbs:
+            - "update"
+            - "get"
 
 required:
 - name

@@ -1,0 +1,8 @@
+engine: gotpl
+name: neuvector-prime-byos
+version: 1.0.0
+#dependencies:
+#- name: core
+#  version: 2.7.8
+  #  repository: file:///home/smarlow/projects/neuvector-helm-gks/charts/core
+  #repository: https://github.com/SUSE-Enceladus/neuvector-helm-gks/tree/payg-bootstrap/charts/core

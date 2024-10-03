@@ -1,0 +1,27 @@
+core:
+  registry: us-east5-docker.pkg.dev
+  containerd:
+    enabled: true
+  global:
+    gcloud:
+      enabled: true
+      image:
+        repository: suse-gce-test/neuvector-prime-payg/neuvector-billing-google-by-suse
+  controller:
+    image:
+      repository: suse-gce-test/neuvector-prime-payg/controller
+  enforcer:
+    image:
+      repository: suse-gce-test/neuvector-prime-payg/enforcer
+  manager:
+    svc:
+      type: LoadBalancer
+    image:
+      repository: suse-gce-test/neuvector-prime-payg/manager
+  cve:  
+    scanner:
+      image:
+        repository: suse-gce-test/neuvector-prime-payg/scanner
+    updater:
+      image:
+        repository: suse-gce-test/neuvector-prime-payg/updater

@@ -11,7 +11,7 @@ metadata:
 spec:
   descriptor:
     type: NeuVector
-    version: "{{ .Values.tag }}"
+    version: "{{ .Values.core.tag }}"
     description: |-
       NeuVector is an open source Container Security Platform.
       # Support
